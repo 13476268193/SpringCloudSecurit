@@ -1,0 +1,103 @@
+
+server:
+  port: 9500
+spring:
+  application:
+    name: authentication-server
+  cloud:
+    inetutils:
+      ignored-interfaces: 'VMware Virtual Ethernet Adapter for VMnet1,VMware Virtual Ethernet Adapter for VMnet8'
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://os.com:9500  #认证中心端点，作为资源端的配置
+          jwk-set-uri: http://os.com:9500/oauth2/jwks
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/security?useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+      initial-size: 5
+      min-idle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      filters: stat,slf4j
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    password: 12345
+    ssl: false
+    timeout: 2000
+
+# feign 配置
+feign:
+  hystrix:
+    enabled: false
+  compression:
+    # 配置响应 GZIP 压缩
+    response:
+      enabled: true
+    # 配置请求 GZIP 压缩
+    request:
+      enabled: true
+      # 支持压缩的mime types
+      mime-types: text/xml,application/xml,application/json
+      # 配置压缩数据大小的最小阀值，默认 2048
+      min-request-size: 2048
+  client:
+    config:
+      default:
+        connectTimeout: 20000
+        readTimeout: 20000
+        loggerLevel: FULL
+
+
+mybatis-plus:
+  mapper-locations: classpath*:/com/security/**/dao/mapping/*Mapper.xml
+  typeAliasesPackage: com.security.modular.*.*.model
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 2
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新mapper 调试神器
+    refresh-mapper: true
+    #数据库大写下划线转换
+    #capital-mode: true
+    #逻辑删除配置
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# token有效期时间
+oauth2:
+  access:
+    token:
+      time: 2
+      unit: H
+  refresh:
+    token:
+      time: 2
+      unit: day
