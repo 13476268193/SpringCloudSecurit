@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.modular.system.dao.ResourceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.system.modular.system.model.SysResource">
+        <id column="id" property="id"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="ancestors" property="ancestors"/>
+        <result column="resource_name" property="resourceName"/>
+        <result column="resource_key" property="resourceKey"/>
+        <result column="resource_type" property="resourceType"/>
+        <result column="resource_icon" property="resourceIcon"/>
+        <result column="resource_path" property="resourcePath"/>
+        <result column="resource_url" property="resourceUrl"/>
+        <result column="resource_level" property="resourceLevel"/>
+        <result column="resource_show" property="resourceShow"/>
+        <result column="resource_cache" property="resourceCache"/>
+        <result column="resource_page_name" property="resourcePageName"/>
+        <result column="resource_status" property="resourceStatus"/>
+        <result column="comments" property="comments"/>
+        <result column="create_time" property="createTime"/>
+        <result column="creator" property="creator"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="operator" property="operator"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenant_id, parent_id, ancestors, resource_name, resource_key, resource_type, resource_icon, resource_path, resource_url, resource_level, resource_show, resource_cache, resource_page_name, resource_status, comments, create_time, creator, update_time, operator, del_flag
+    </sql>
+
+    <!-- 根据用户名查询用户权限 -->
+    <select id="queryResourceByUserId" resultType="com.system.modular.system.model.SysResource"
+            parameterType="com.system.modular.system.dto.QueryUserResourceDTO">
+        SELECT DISTINCT
+        sysResource.id,
+        sysResource.tenant_id,
+        sysResource.parent_id,
+        sysResource.ancestors,
+        sysResource.resource_name,
+        sysResource.resource_key,
+        sysResource.resource_type,
+        sysResource.resource_icon,
+        sysResource.resource_path,
+        sysResource.resource_url,
+        sysResource.resource_cache,
+        sysResource.resource_show,
+        sysResource.resource_level,
+        sysResource.resource_page_name,
+        sysResource.resource_status
+        FROM t_sys_user sysUser
+        INNER JOIN t_sys_user_role userRole ON sysUser.id = userRole.user_id AND userRole.del_flag = 0
+        INNER JOIN t_sys_role_resource roleResource ON userRole.role_id = roleResource.role_id AND roleResource.del_flag = 0
+        INNER JOIN t_sys_resource sysResource ON roleResource.resource_id = sysResource.id AND sysResource.del_flag = 0
+        WHERE sysUser.del_flag = 0
+        <if test="userResource.userId != null and userResource.userId != ''">
+            AND sysUser.id = #{userResource.userId}
+        </if>
+        <if test="userResource.resourceTypeList != null and userResource.resourceTypeList.size > 0 ">
+            and sysResource.resource_type in
+            <foreach collection="userResource.resourceTypeList" item ="resourceType" index="i" open="(" close=")" separator=",">
+                #{resourceType}
+            </foreach>
+        </if>
+        ORDER BY resource_level
+    </select>
+
+</mapper>

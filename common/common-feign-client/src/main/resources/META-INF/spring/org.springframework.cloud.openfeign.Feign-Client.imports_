@@ -1,0 +1,3 @@
+com.feign.client.AuthorizationClient
+com.feign.client.UserDetailsClient
+com.feign.client.UserClient
