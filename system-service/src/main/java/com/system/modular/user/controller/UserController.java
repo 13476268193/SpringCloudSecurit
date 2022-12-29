@@ -67,21 +67,6 @@ public class UserController {
         return pageResult;
     }
 
-
-//    @PreAuthorize("#oauth2.hasScope('fly')")
-    @GetMapping("/messages")
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('message.read') ")
-//    @PreAuthorize("hasAuthority('USER') or hasAuthority('message.read') or hasAuthority('system:user:list') ")
-    public Object getMessages(@AuthenticationPrincipal UserPrincipal principal) {
-//		String userName = JwtService.getClaim(jwt, "userName", String.class);
-//		System.out.println(JSONUtils.toJSONString(jwt));
-        Long id = principal.getId();
-//        return userClient.queryUserInfo(principal.getUsername(), null);
-        return mawbTrackingClient.getMawbTracking("88036039419");
-//        return new String[] {"Message 1", "Message 2", "Message 3"};
-    }
-
-
     /**
      * 获取登录后的用户信息
      */
